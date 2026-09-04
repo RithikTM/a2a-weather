@@ -64,6 +64,19 @@ class WeatherAgentExecutor(AgentExecutor):
         
         return ""
     
+    _CITY_FILLER = {'weather', 'forecast', 'temperature', 'temp', 'climate',
+                    'conditions', 'today', 'tomorrow', 'now', 'currently',
+                    'the', 'in', 'for', 'at', 'of', 'please'}
+
+    def _clean_city(self, city: str) -> str:
+        """Strip filler words (e.g. trailing 'weather') from a captured city name."""
+        words = city.strip().split()
+        while words and words[-1].lower() in self._CITY_FILLER:
+            words.pop()
+        while words and words[0].lower() in self._CITY_FILLER:
+            words.pop(0)
+        return " ".join(words)
+
     def _extract_city(self, query: str) -> str | None:
         """Extract city name from query."""
         # Common patterns for city extraction
@@ -119,9 +132,10 @@ class WeatherAgentExecutor(AgentExecutor):
         for pattern in compare_patterns:
             match = re.search(pattern, query, re.IGNORECASE)
             if match:
-                city1 = match.group(1).strip()
-                city2 = match.group(2).strip()
-                return ("compare", {"city1": city1, "city2": city2})
+                city1 = self._clean_city(match.group(1))
+                city2 = self._clean_city(match.group(2))
+                if city1 and city2:
+                    return ("compare", {"city1": city1, "city2": city2})
         
         # =====================================================================
         # Intent: Weather Forecast

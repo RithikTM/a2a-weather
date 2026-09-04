@@ -8,6 +8,7 @@ This agent provides:
 4. Weather-based recommendations
 5. Natural language weather queries
 """
+import asyncio
 import os
 import json
 from typing import Any
@@ -38,14 +39,21 @@ class WeatherAgent:
             raise ValueError("GEMINI_API_KEY environment variable is required")
         
         self.genai_client = genai.Client(api_key=api_key)
-        self.model = "gemini-2.0-flash"
+        # gemini-2.0-flash was retired. gemini-3.6-flash (the API's suggested
+        # replacement) takes 15-20s per call even with minimal thinking, which
+        # blows the client timeout on the two-call natural-language path, so
+        # default to the fast flash-lite model. Override with GEMINI_MODEL.
+        self.model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
     
     async def _ai_analyze(self, prompt: str) -> str:
         """Use Gemini to analyze and generate insights."""
         try:
-            response = self.genai_client.models.generate_content(
+            # The genai client is synchronous; run it off the event loop so a
+            # slow model call doesn't stall other requests.
+            response = await asyncio.to_thread(
+                self.genai_client.models.generate_content,
                 model=self.model,
-                contents=prompt
+                contents=prompt,
             )
             return response.text.strip()
         except Exception as e:
