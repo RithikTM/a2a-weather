@@ -240,11 +240,11 @@ def create_app(host: str = "0.0.0.0", port: int = 8000):
     all_routes = list(base_app.routes) + additional_routes
     
     # Create final app with middleware
+    # Starlette 1.x removed on_startup/on_shutdown; reuse the base app's lifespan.
     app = Starlette(
         routes=all_routes,
         middleware=middleware,
-        on_startup=base_app.on_startup if hasattr(base_app, 'on_startup') else None,
-        on_shutdown=base_app.on_shutdown if hasattr(base_app, 'on_shutdown') else None,
+        lifespan=base_app.router.lifespan_context,
     )
     
     return app

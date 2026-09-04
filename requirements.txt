@@ -1,5 +1,5 @@
 # A2A Protocol SDK
-a2a-sdk[http-server]>=0.3.0
+a2a-sdk[http-server]==0.3.26
 
 # AI for natural language processing
 google-genai>=1.0.0
