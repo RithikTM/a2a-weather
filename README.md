@@ -73,6 +73,7 @@ Edit `.env` with your API keys:
 ```bash
 OPENWEATHER_API_KEY=your_openweather_key
 GEMINI_API_KEY=your_gemini_key
+GEMINI_MODEL=gemini-3.5-flash-lite   # optional, this is the default
 
 # For production deployment
 HOST_URL=https://your-service.onrender.com
@@ -125,6 +126,7 @@ In Render Dashboard → Environment, add:
 |----------|-------|----------|
 | `OPENWEATHER_API_KEY` | Your OpenWeather key | ✅ Yes |
 | `GEMINI_API_KEY` | Your Gemini key | ✅ Yes |
+| `GEMINI_MODEL` | Gemini model name (default `gemini-3.5-flash-lite`) | Optional |
 | `HOST_URL` | `https://your-service.onrender.com` | ✅ Yes |
 | `A2A_API_KEY` | Your secure API key | Optional |
 
